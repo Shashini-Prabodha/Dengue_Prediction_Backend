@@ -1,65 +1,38 @@
-import json
-
-from flask import Flask, request, redirect, jsonify, Response
-from flask_sqlalchemy import SQLAlchemy
-import os
-import enum
-
+from flask import Flask, json, jsonify, request
+from config import mongo_db
 
 app = Flask(__name__)
-app.secret_key = "super secret key"
-
-db_path = os.path.join(os.path.dirname(__file__), 'app.db')
-app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{db_path}'
-db = SQLAlchemy(app)
+app.secret_key = 'secret_key'
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(50), unique=True, nullable=False)
-    task = db.relationship("Task", backref="user", lazy=True)
+# routes ---------------------------------------------------------------------------------------------------------------
+@app.route('/')
+def root_route():
+    return 'Welcome..!'
 
 
-class TaskStatus(enum.Enum):
-    DONE = "Done"
-    PENDING = "Pending"
+# user sign up --------------------------------------
+@app.route('/sign_up', methods=["GET", "POST"])
+def user_sign_up():
+    user_sign_up_data = json.loads(request.data)
+    print("LOG ==> ", user_sign_up_data)
+    mongo_db.USER.insert_one(user_sign_up_data)
+    return "User Sign Up"
 
 
-class Task(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    task = db.Column(db.String(250), nullable=False)
-    status = db.Column(db.Enum(TaskStatus), default=TaskStatus.PENDING)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    date = db.Column(db.String(250), nullable=False)
+# get all users  ------------------------------------
+@app.route('/users', methods=["GET"])
+def get_all_users():
+    get_db_users = mongo_db.USER.find()
+    users = []
+    for data in get_db_users:
+        data['_id'] = str(data['_id'])
+        users.append(data)
+    print(users)
+    return jsonify(users)
 
 
-db.create_all()
 
-
-@app.route('/login', methods=["POST", "GET"])
-def login():
-    # if request.method == "POST":
-    #     username = request.form["username"]
-    #
-    #     existing_user = User.query.filter_by(username=username).first()
-    #     print(existing_user)
-    #     if existing_user is None:
-    #         user = User(username=username)
-    #         db.session.add(user)
-    #         db.session.commit()
-    #         existing_user = user
-    #
-    #     session["user_id"] = existing_user.id
-    #     return redirect("/task")
-    # return render_template("login.html")
-
-    articles = User.query.all()
-    print(type(articles))
-
-    # return Response(json.dumps(articles),  mimetype='application/json')
-    return jsonify(results=articles)
 
 if __name__ == '__main__':
     app.run(debug=True)
