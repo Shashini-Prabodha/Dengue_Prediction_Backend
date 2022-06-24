@@ -1,4 +1,6 @@
 from flask import Flask, json, jsonify, request
+
+
 from config import mongo_db
 
 app = Flask(__name__)
@@ -20,17 +22,20 @@ def sign_up():
     return "User Sign Up"
 
 
-# get all users  ------------------------------------
-@app.route('/user', methods=["GET"])
-def get_one_user():
-    email = json.loads(request.data)
-    user_details = mongo_db.USER.find_one({'email': email})
-    print(user_details)
-    return jsonify(user_details)
+@app.route('/search_user', methods=["GET"])
+def search_user():
 
+    req_user_id = json.loads(request.data)
+    print(req_user_id)
+    search_id = req_user_id['email']
+    print(search_id)
+    search_user_details = mongo_db.USER.find_one({"email": search_id})
+    print(type(search_user_details))
 
+    # return jsonify(search_user_details)
+    return search_user_details
 
-# get all users  ------------------------------------
+# get all user  ------------------------------------
 @app.route('/all_users', methods=["GET"])
 def get_all_users():
     get_db_users = mongo_db.USER.find()
@@ -63,8 +68,8 @@ def update_user():
 @app.route('/delete_user', methods=["DELETE"])
 def delete_user():
     user_deletes = json.loads(request.data)
-    user_del_id = user_deletes['_id']
-    mongo_db.USER.delete_one({"_id": user_del_id})
+    user_del_id = user_deletes['email']
+    mongo_db.USER.delete_one({"email": user_del_id})
     return "User Delete"
 
 
