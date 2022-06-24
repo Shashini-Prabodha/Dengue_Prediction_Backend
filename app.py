@@ -7,13 +7,13 @@ app.secret_key = 'secret_key'
 
 # routes ---------------------------------------------------------------------------------------------------------------
 @app.route('/')
-def root_route():
+def root():
     return 'Welcome..!'
 
 
 # user sign up --------------------------------------
 @app.route('/sign_up', methods=["GET", "POST"])
-def user_sign_up():
+def sign_up():
     user_sign_up_data = json.loads(request.data)
     print("LOG ==> ", user_sign_up_data)
     mongo_db.USER.insert_one(user_sign_up_data)
@@ -21,7 +21,17 @@ def user_sign_up():
 
 
 # get all users  ------------------------------------
-@app.route('/users', methods=["GET"])
+@app.route('/user', methods=["GET"])
+def get_one_user():
+    email = json.loads(request.data)
+    user_details = mongo_db.USER.find_one({'email': email})
+    print(user_details)
+    return jsonify(user_details)
+
+
+
+# get all users  ------------------------------------
+@app.route('/all_users', methods=["GET"])
 def get_all_users():
     get_db_users = mongo_db.USER.find()
     users = []
@@ -33,10 +43,10 @@ def get_all_users():
 
 
 # user update ---------------------------------------
-@app.route('/user_update', methods=["PATCH"])
-def user_update():
+@app.route('/update_user', methods=["PATCH"])
+def update_user():
     user_updates = json.loads(request.data)
-    # user_up_id = user_updates['_id']
+    user_up_id = user_updates['_id']
     name = user_updates['name']
     email = user_updates['email']
     district = user_updates['district']
@@ -50,8 +60,8 @@ def user_update():
 
 
 # user delete ---------------------------------------
-@app.route('/user_delete', methods=["DELETE"])
-def user_delete():
+@app.route('/delete_user', methods=["DELETE"])
+def delete_user():
     user_deletes = json.loads(request.data)
     user_del_id = user_deletes['_id']
     mongo_db.USER.delete_one({"_id": user_del_id})
