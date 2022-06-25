@@ -27,7 +27,7 @@ def search_user_login():
     req_user_email = request.args["email"]
     # print(req_user_id)
     # search_id = req_user_email['email']
-    print(search_id)
+    print(req_user_email)
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
     print(type(search_user_details))
 
