@@ -12,19 +12,14 @@ def root():
     return 'Welcome..!'
 
 
-@app.route('/get_Id', methods=["GET"])
-def get_Id():
-    count = mongo_db.USER.count_documents({}) + 1
-    return str(count)
-
-
 # user sign up --------------------------------------
 @app.route('/sign_up', methods=["GET", "POST"])
 def sign_up():
     user_sign_up_data = json.loads(request.data)
     print("LOG ==> ", user_sign_up_data)
+    id = mongo_db.USER.count_documents({}) + 1
 
-    record = {"_id": user_sign_up_data['_id'],
+    record = {"_id": id,
               "email": user_sign_up_data['email'],
               "name": user_sign_up_data['name'],
               "password": user_sign_up_data["password"],
