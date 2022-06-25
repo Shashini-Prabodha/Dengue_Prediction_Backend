@@ -12,6 +12,10 @@ app.secret_key = 'secret_key'
 def root():
     return 'Welcome..!'
 
+@app.route('/get_Id', methods=["GET"])
+def get_Id():
+    count=mongo_db.USER.count_documents({})+1
+    return str(count)
 
 # user sign up --------------------------------------
 @app.route('/sign_up', methods=["GET", "POST"])
@@ -50,6 +54,7 @@ def search_user():
 # get all user  ------------------------------------
 @app.route('/all_users', methods=["GET"])
 def get_all_users():
+
     get_db_users = mongo_db.USER.find()
     users = []
     for data in get_db_users:
