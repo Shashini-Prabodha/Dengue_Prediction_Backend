@@ -21,6 +21,18 @@ def sign_up():
     mongo_db.USER.insert_one(user_sign_up_data)
     return "User Sign Up"
 
+@app.route('/login_user', methods=["GET"])
+def search_user_login():
+
+    req_user_email = request.args["email"]
+    # print(req_user_id)
+    # search_id = req_user_email['email']
+    print(search_id)
+    search_user_details = mongo_db.USER.find_one({"email": req_user_email})
+    print(type(search_user_details))
+
+    # return jsonify(search_user_details)
+    return search_user_details
 
 @app.route('/search_user', methods=["GET"])
 def search_user():
