@@ -62,15 +62,15 @@ def get_all_users():
 # user update ---------------------------------------
 @app.route('/update_user', methods=["PATCH"])
 def update_user():
+
     user_updates = json.loads(request.data)
-    user_up_id = user_updates['_id']
     name = user_updates['name']
     email = user_updates['email']
     district = user_updates['district']
 
     mongo_db.USER.update_one({"email": email}, {"$set": {
         "name": name,
-        "district": district,
+        "district": district
     }})
 
     return "update user"
