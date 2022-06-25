@@ -17,15 +17,15 @@ def root():
 def sign_up():
     user_sign_up_data = json.loads(request.data)
     print("LOG ==> ", user_sign_up_data)
-    id = mongo_db.USER.count_documents({}) + 1
-
-    record = {"_id": id,
-              "email": user_sign_up_data['email'],
-              "name": user_sign_up_data['name'],
-              "password": user_sign_up_data["password"],
-              "district": user_sign_up_data['district'],
-              }
-    mongo_db.USER.insert_one(record)
+    # id = mongo_db.USER.count_documents({}) + 1
+    #
+    # record = {"_id": id,
+    #           "email": user_sign_up_data['email'],
+    #           "name": user_sign_up_data['name'],
+    #           "password": user_sign_up_data["password"],
+    #           "district": user_sign_up_data['district'],
+    #           }
+    mongo_db.USER.insert_one(user_sign_up_data)
     return "User Sign Up"
 
 
