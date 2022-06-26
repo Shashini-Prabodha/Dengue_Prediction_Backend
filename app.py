@@ -26,7 +26,7 @@ def sign_up():
               }
     mongo_db.USER.insert_one(record)
 
-    mongo_db.USER.insert_one(user_sign_up_data)
+    # mongo_db.USER.insert_one(user_sign_up_data)
     return "User Sign Up"
 
 
