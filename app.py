@@ -107,7 +107,7 @@ def renderblog():
     # parse file
     obj = json.loads(data)
 
-    for i in range(3):
+    for i in range(11):
         print("obj ", obj[i]['task'],i)
         record = {
             "_id": obj[i]['_id'],
