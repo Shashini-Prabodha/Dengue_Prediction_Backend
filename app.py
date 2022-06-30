@@ -19,22 +19,21 @@ def sign_up():
     print("LOG ==> ", user_sign_up_data)
     req_user_email = user_sign_up_data['email']
 
-
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
 
     try:
-       if search_user_details.__len__() > 0:
-        return "Already exist"
+        if search_user_details.__len__() > 0:
+            return "Already exist"
     except Exception:
         print("search_user_details else ", search_user_details)
 
         # id = "D" + str(mongo_db.USER.count_documents({}) + 1)
         record = {
-                  "email": user_sign_up_data['email'],
-                  "name": user_sign_up_data['name'],
-                  "password": user_sign_up_data["password"],
-                  "district": user_sign_up_data['district'],
-                  }
+            "email": user_sign_up_data['email'],
+            "name": user_sign_up_data['name'],
+            "password": user_sign_up_data["password"],
+            "district": user_sign_up_data['district'],
+        }
         mongo_db.USER.insert_one(record)
 
         # mongo_db.USER.insert_one(user_sign_up_data)
@@ -98,5 +97,27 @@ def delete_user():
         return "null"
 
 
+def renderblog():
+    # filename = os.path.join(app.static_folder, 'blogs.json')
+    # with open(filename) as blog_file:
+    #     data = json.load(blog_file)
+
+    with open('example.json', 'r') as myfile:
+        data = myfile.read()
+    # parse file
+    obj = json.loads(data)
+
+    for i in range(3):
+        print("obj ", obj[i]['task'],i)
+        record = {
+            "_id": obj[i]['_id'],
+            "task": obj[i]['task']
+        }
+        mongo_db.TASK.insert_one(record)
+
+renderblog()
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+

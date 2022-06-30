@@ -1,0 +1,42 @@
+[
+  {
+    "_id": 1,
+    "task": "Check for water accumulation on the trays of dish drying rack"
+  },
+  {
+    "_id": 2,
+    "task": "Use insecticide sprays in dark corners (under the bed, sofa and behind curtains) and burn repellent oils inside your home"
+  },
+  {
+    "_id": 3,
+    "task": "Turn over all water storage containers when empty and store them under a shelter"
+  },
+  {
+    "_id": 4,
+    "task": "Loosen soil in potted plants to prevent accumulation of stagnant water on surface"
+  },
+  {
+    "_id": 5,
+    "task": "Change water in vases/bowls and remove water from flower/plant pot plates"
+  },
+  {
+    "_id": 6,
+    "task": "Check for water ponding due to leakage underneath kitchen sink / bathroom basin"
+  },
+  {
+    "_id": 7,
+    "task": "Clear fallen leaves and other blockages in roof gutters"
+  },
+  {
+    "_id": 8,
+    "task": "Use sand granular insecticide in gully traps and roof gutters"
+  },
+  {
+    "_id": 9,
+    "task": "Dispose of waste properly. If possible, use closed trash bins and take out your trash on a regular basis."
+  },
+  {
+    "_id": 10,
+    "task": "Consider putting up screens on your windows and doors to prevent mosquitoes from entering your home."
+  }
+]
