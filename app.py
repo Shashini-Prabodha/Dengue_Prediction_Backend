@@ -1,4 +1,5 @@
-from flask import Flask, json, jsonify, request, session
+from bson import json_util
+from flask import Flask, json, jsonify, request, abort
 
 from config import mongo_db
 
@@ -16,43 +17,41 @@ def root():
 def sign_up():
     user_sign_up_data = json.loads(request.data)
     print("LOG ==> ", user_sign_up_data)
-    id = mongo_db.USER.count_documents({}) + 1
-
-    record = {"_id": id,
-              "email": user_sign_up_data['email'],
-              "name": user_sign_up_data['name'],
-              "password": user_sign_up_data["password"],
-              "district": user_sign_up_data['district'],
-              }
-    mongo_db.USER.insert_one(record)
-
-    # mongo_db.USER.insert_one(user_sign_up_data)
-    return "User Sign Up"
+    req_user_email = user_sign_up_data['email']
 
 
-@app.route('/login_user', methods=["GET"])
-def search_user_login():
-    req_user_email = request.args["email"]
-    # print(req_user_id)
-    # search_id = req_user_email['email']
-    print(req_user_email)
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
-    print(type(search_user_details))
-    return jsonify(search_user_details)
-    # return search_user_details
+
+    try:
+       if search_user_details.__len__() > 0:
+        return "Already exist"
+    except Exception:
+        print("search_user_details else ", search_user_details)
+
+        # id = "D" + str(mongo_db.USER.count_documents({}) + 1)
+        record = {
+                  "email": user_sign_up_data['email'],
+                  "name": user_sign_up_data['name'],
+                  "password": user_sign_up_data["password"],
+                  "district": user_sign_up_data['district'],
+                  }
+        mongo_db.USER.insert_one(record)
+
+        # mongo_db.USER.insert_one(user_sign_up_data)
+        return "User Sign Up"
 
 
 @app.route('/search_user', methods=["GET"])
 def search_user():
-    req_user_id = json.loads(request.data)
-    print(req_user_id)
-    search_id = req_user_id['email']
-    print(search_id)
-    search_user_details = mongo_db.USER.find_one({"email": search_id})
-    print(type(search_user_details))
-
-    # return jsonify(search_user_details)
-    return search_user_details
+    try:
+        req_user_email = request.args["email"]
+        print(req_user_email)
+        search_user_details = mongo_db.USER.find_one({"email": req_user_email})
+        # search_user_details['age']=5
+        print((search_user_details))
+        return json.loads(json_util.dumps(search_user_details))
+    except Exception as e:
+        return "null"
 
 
 # get all user  ------------------------------------
@@ -75,12 +74,15 @@ def update_user():
     email = user_updates['email']
     district = user_updates['district']
     print('email ', email)
-    mongo_db.USER.update_one({"email": email}, {"$set": {
+    result = mongo_db.USER.update_one({"email": email}, {"$set": {
         "name": name,
         "district": district
-    }})
+    }}).raw_result.get('n')
 
-    return "update user"
+    if result == 1:
+        return "update user"
+    else:
+        return "null"
 
 
 # user delete ---------------------------------------
@@ -88,8 +90,12 @@ def update_user():
 def delete_user():
     user_deletes = json.loads(request.data)
     user_del_id = user_deletes['email']
-    mongo_db.USER.delete_one({"email": user_del_id})
-    return "User Delete"
+    result = mongo_db.USER.delete_one({"email": user_del_id}).raw_result.get('n')
+
+    if result == 1:
+        return "Deleted user"
+    else:
+        return "null"
 
 
 if __name__ == '__main__':
