@@ -55,7 +55,7 @@ def sign_up():
         session["name"] = user_sign_up_data['name']
         session["password"] = user_sign_up_data["password"]
         session["district"] = user_sign_up_data['district']
-        return "User Sign Up"
+        # return "User Sign Up"
         return result
 
 
