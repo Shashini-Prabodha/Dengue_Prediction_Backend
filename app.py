@@ -1,8 +1,6 @@
 from bson import json_util
-from flask import Flask, json, jsonify, request, session
-
 from config import mongo_db
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, json, session
 from flaskext.mysql import MySQL
 import pymysql
 
@@ -49,28 +47,27 @@ def sign_up():
 
         mongo_db.USER.insert_one(record)
 
-        session['email']=user_sign_up_data['email']
+        session['email'] = user_sign_up_data['email']
         session["name"] = user_sign_up_data['name']
         session["password"] = user_sign_up_data["password"]
         session["district"] = user_sign_up_data['district']
-
         return "User Sign Up"
 
 
-@app.route('/search_user', methods=["GET"])
-def search_user():
-    try:
-        req_user_email = request.args["email"]
-        print(req_user_email)
-        search_user_details = mongo_db.USER.find_one({"email": req_user_email})
-        # search_user_details['age']=5
-        print((search_user_details))
-
-        return json.loads(json_util.dumps(search_user_details))
-    except Exception as e:
-
-        print(e)
-        return "null"
+# @app.route('/search_user', methods=["GET"])
+# def search_user():
+#     try:
+#         req_user_email = request.args["email"]
+#         print(req_user_email)
+#         search_user_details = mongo_db.USER.find_one({"email": req_user_email})
+#         # search_user_details['age']=5
+#         print((search_user_details))
+#
+#         return json.loads(json_util.dumps(search_user_details))
+#     except Exception as e:
+#
+#         print(e)
+#         return "null"
 
 
 # get all user  ------------------------------------
@@ -84,20 +81,26 @@ def get_all_users():
     print(users)
     return jsonify(users)
 
-@app.route('/login_user', methods=["GET"])
-def search_user_login():
 
+@app.route('/get_user', methods=["GET"])
+def get_user():
     req_user_email = request.args["email"]
-    # print(req_user_id)
-    # search_id = req_user_email['email']
     print(req_user_email)
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
-    print(type(search_user_details))
-    return jsonify(search_user_details)
-    # return search_user_details
+    # search_user_details['predict']=session.get('this_month_pred')
+    # search_user_details['zone']=session.get('zone')
 
-    # return jsonify(search_user_details)
-    return search_user_details
+    list=getPredict(search_user_details['district'])
+
+    search_user_details['predict'] = list[0]
+    search_user_details['zone'] = list[1]
+
+    # print(search_user_details)
+
+    json_dump = json_util.dumps(search_user_details)
+    json_data = json.loads(json_dump)
+
+    return jsonify(json_data)
 
 
 # user update ---------------------------------------
@@ -112,6 +115,8 @@ def update_user():
         "name": name,
         "district": district
     }}).raw_result.get('n')
+
+    getPredict(session.get("district"))
 
     if result == 1:
         return "update user"
@@ -133,7 +138,6 @@ def delete_user():
 
 
 # get zone
-# @app.route('/getzone', methods=["GET"])
 def getPredict(city):
     print('in')
     # city =json.loads(request.data)
@@ -144,25 +148,31 @@ def getPredict(city):
         conn = mysql.connect()
         print("1")
         cursor = conn.cursor()
-        cursor.execute("select avg(value) from dengue_d.dd where city = %s and  date like '%%01-01' ",city)
+        cursor.execute("select avg(value) from dengue_d.dd where city = %s and  date like '%%01-01' ", city)
         print("2")
         rows = cursor.fetchall().__getitem__(0)
         print(rows)
-        list=[]
+        list = []
+        p=0.0
         for data in rows:
-            list.append(float(data))
+            p=(float(data))
 
-        predict=int(round(list[0]))
-        session['this_month_pred']=predict
+        print(p, "**")
+        predict = int(round(p))
+        # session['this_month_pred'] = predict
+        print(predict)
+        list.append(predict)
 
         if predict >= 800:
-            session['zone'] = "Red"
-        elif predict >=200:
-            session['zone'] = "Yellow"
+            list.append("Red")
+        elif predict >= 200:
+            # zone = "Yellow"
+            list.append("Yellow")
         else:
-            session['zone'] = "Green"
+            list.append("Green")
+            # session['zone'] = "Green"
 
-        return predict
+        return list
 
     except Exception as e:
         print(e)
