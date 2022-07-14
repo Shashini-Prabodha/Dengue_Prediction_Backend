@@ -93,8 +93,8 @@ def get_user():
 
         list = getPredict(search_user_details['district'])
 
-        search_user_details['predict'] = list[0]
-        search_user_details['zone'] = list[1]
+        # search_user_details['predict'] = list[0]
+        # search_user_details['zone'] = list[1]
 
         # print(search_user_details)
 
