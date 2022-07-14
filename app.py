@@ -84,23 +84,27 @@ def get_all_users():
 
 @app.route('/get_user', methods=["GET"])
 def get_user():
-    req_user_email = request.args["email"]
-    print(req_user_email)
-    search_user_details = mongo_db.USER.find_one({"email": req_user_email})
-    # search_user_details['predict']=session.get('this_month_pred')
-    # search_user_details['zone']=session.get('zone')
+    try:
+        req_user_email = request.args["email"]
+        print(req_user_email)
+        search_user_details = mongo_db.USER.find_one({"email": req_user_email})
+        # search_user_details['predict']=session.get('this_month_pred')
+        # search_user_details['zone']=session.get('zone')
 
-    list=getPredict(search_user_details['district'])
+        list = getPredict(search_user_details['district'])
 
-    search_user_details['predict'] = list[0]
-    search_user_details['zone'] = list[1]
+        search_user_details['predict'] = list[0]
+        search_user_details['zone'] = list[1]
 
-    # print(search_user_details)
+        # print(search_user_details)
 
-    json_dump = json_util.dumps(search_user_details)
-    json_data = json.loads(json_dump)
+        json_dump = json_util.dumps(search_user_details)
+        json_data = json.loads(json_dump)
 
-    return jsonify(json_data)
+        return jsonify(json_data)
+    except Exception as e:
+        print(e)
+        return "null"
 
 
 # user update ---------------------------------------
@@ -153,9 +157,9 @@ def getPredict(city):
         rows = cursor.fetchall().__getitem__(0)
         print(rows)
         list = []
-        p=0.0
+        p = 0.0
         for data in rows:
-            p=(float(data))
+            p = (float(data))
 
         print(p, "**")
         predict = int(round(p))
