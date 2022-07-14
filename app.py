@@ -186,10 +186,40 @@ def to_do():
         mongo_db.TODO.insert_one(record)
 
         return "saved"
+    except Exception :
+        return "null"
+
+
+@app.route('/get_todoby_user', methods=["GET"])
+def get_todo_by_user():
+    try:
+        email = request.args["email"]
+        print(email)
+
+        todo_by_user = mongo_db.TODO.find()
+        taskid = []
+        for data in todo_by_user:
+            taskid.append(data['taskid'])
+        print(taskid)
+        return jsonify(taskid)
+
     except Exception as e:
+        print(e)
+        return "null"
 
-        return e
 
+@app.route('/delete_todo', methods=["DELETE"])
+def delete_todo():
+    user_deletes = json.loads(request.data)
+    email = user_deletes['email']
+    print(email)
+
+    result = mongo_db.TODO.delete_many({"email": email}).raw_result.get('n')
+    print(result)
+    if result >0:
+        return "Deleted user"
+    else:
+        return "null"
 
 # get zone
 def getPredict(city):
