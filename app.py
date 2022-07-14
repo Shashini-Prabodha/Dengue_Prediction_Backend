@@ -107,6 +107,31 @@ def get_user():
         return "null"
 
 
+@app.route('/get_pred', methods=["GET"])
+def get_pred():
+    try:
+        user_district = request.args["district"]
+        print(user_district)
+        list = getPredict(user_district)
+
+        # search_user_details['predict'] = list[0]
+        # search_user_details['zone'] = list[1]
+
+        # print(search_user_details)
+        #
+        # json_dump = json_util.dumps(search_user_details)
+        # json_data = json.loads(json_dump)
+        print(list)
+        json_data = {
+            'predict': list[0],
+            'zone': list[1]
+        }
+        print(json_data)
+        return jsonify(json_data)
+    except Exception as e:
+        print(e)
+        return "null"
+
 # user update ---------------------------------------
 @app.route('/update_user', methods=["PATCH"])
 def update_user():
