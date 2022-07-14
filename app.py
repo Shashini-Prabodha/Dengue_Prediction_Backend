@@ -30,6 +30,9 @@ def sign_up():
     print("LOG ==> ", user_sign_up_data)
     req_user_email = user_sign_up_data['email']
 
+    result={
+        'staus':'200'
+    }
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
 
     try:
@@ -52,7 +55,7 @@ def sign_up():
         session["name"] = user_sign_up_data['name']
         session["password"] = user_sign_up_data["password"]
         session["district"] = user_sign_up_data['district']
-        return "Saved"
+        return result
 
 
 # @app.route('/search_user', methods=["GET"])
