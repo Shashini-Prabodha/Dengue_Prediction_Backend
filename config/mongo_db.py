@@ -14,4 +14,5 @@ MONGO_DATABASE = CLIENT.get_database('dengue_db')
 # create table ================================================================
 USER = pymongo.collection.Collection(MONGO_DATABASE, 'users')
 TASK = pymongo.collection.Collection(MONGO_DATABASE, 'task')
+TODO = pymongo.collection.Collection(MONGO_DATABASE, 'todo')
 DATA = pymongo.collection.Collection(MONGO_DATABASE, 'data')

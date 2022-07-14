@@ -31,12 +31,8 @@ def sign_up():
 
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
 
-    result={
-        'staus':'200'
-    }
     try:
         if search_user_details.__len__() > 0:
-            result['staus'] = '400'
             return "null"
     except Exception:
         print("search_user_details else ", search_user_details)
@@ -55,7 +51,7 @@ def sign_up():
         session["name"] = user_sign_up_data['name']
         session["password"] = user_sign_up_data["password"]
         session["district"] = user_sign_up_data['district']
-        return result
+        return "Saved"
 
 
 # @app.route('/search_user', methods=["GET"])
@@ -136,6 +132,7 @@ def get_pred():
         print(e)
         return "null"
 
+
 # user update ---------------------------------------
 @app.route('/update_user', methods=["PATCH"])
 def update_user():
@@ -168,6 +165,30 @@ def delete_user():
         return "Deleted user"
     else:
         return "null"
+
+
+# ---------------------------------------------------------------------------------------------------
+
+@app.route('/todo', methods=["GET", "POST"])
+def to_do():
+    task = json.loads(request.data)
+    print("LOG ==> ", task)
+    email = task['email']
+
+    try:
+
+        record = {
+            "taskid": task['taskid'],
+            "email": task['email'],
+            "status": task["status"],
+            "date": task['date'],
+        }
+        mongo_db.TODO.insert_one(record)
+
+        return "saved"
+    except Exception as e:
+
+        return e
 
 
 # get zone
