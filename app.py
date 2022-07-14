@@ -37,7 +37,7 @@ def sign_up():
     try:
         if search_user_details.__len__() > 0:
             result['staus'] = '400'
-            return result
+            return "null"
     except Exception:
         print("search_user_details else ", search_user_details)
 
