@@ -196,7 +196,7 @@ def get_todo_by_user():
         email = request.args["email"]
         print(email)
 
-        todo_by_user = mongo_db.TODO.find()
+        todo_by_user = mongo_db.TODO.find({"email": email})
         taskid = []
         for data in todo_by_user:
             taskid.append(data['taskid'])
