@@ -3,6 +3,7 @@ from config import mongo_db
 from flask import Flask, jsonify, request, json, session
 from flaskext.mysql import MySQL
 import pymysql
+import re
 
 app = Flask(__name__)
 
@@ -91,7 +92,7 @@ def get_user():
         # search_user_details['predict']=session.get('this_month_pred')
         # search_user_details['zone']=session.get('zone')
 
-        list = getPredict(search_user_details['district'])
+        # list = getPredict(search_user_details['district'])
 
         # search_user_details['predict'] = list[0]
         # search_user_details['zone'] = list[1]
@@ -146,7 +147,7 @@ def update_user():
         "district": district
     }}).raw_result.get('n')
 
-    getPredict(session.get("district"))
+    # getPredict(session.get("district"))
 
     if result == 1:
         return "update user"
@@ -186,7 +187,7 @@ def to_do():
         mongo_db.TODO.insert_one(record)
 
         return "saved"
-    except Exception :
+    except Exception:
         return "null"
 
 
@@ -216,10 +217,56 @@ def delete_todo():
 
     result = mongo_db.TODO.delete_many({"email": email}).raw_result.get('n')
     print(result)
-    if result >0:
+    if result > 0:
         return "Deleted user"
     else:
         return "null"
+
+
+@app.route('/mongo_pred', methods=["GET"])
+def mongo_pred():
+    try:
+
+        rgx = re.compile('.*-01-01.*', re.IGNORECASE)
+        district = request.args["district"]
+        print(district)
+        q = {
+            'City': {
+                '$eq': district
+            },
+            'Date': rgx
+        }
+        todo_by_user = mongo_db.DATA.find(q)
+        print(todo_by_user.collection," *")
+        taskid = []
+        sum=0
+        for data in todo_by_user:
+            taskid.append(data['Value'])
+            sum+=data['Value']
+        avg= sum / len(taskid)
+
+        print(avg)
+        list=[]
+        predict = int(round(avg))
+        # session['this_month_pred'] = predict
+        print(predict)
+        list.append(predict)
+
+        if predict >= 1000:
+            list.append("Red")
+        elif predict >= 500:
+            # zone = "Yellow"
+            list.append("Yellow")
+        else:
+            list.append("Green")
+            # session['zone'] = "Green"
+
+        return jsonify(list)
+
+    except Exception as e:
+        print(e)
+        return "null"
+
 
 # get zone
 def getPredict(city):
