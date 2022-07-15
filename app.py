@@ -182,7 +182,7 @@ def to_do():
     print("LOG ==> ", task)
     email = task['email']
 
-    details = mongo_db.TODO.find_one({"taskid": task['taskid'], "email":task["email"]})
+    details = mongo_db.TODO.find({"taskid": task['taskid'], "email":task["email"]})
 
     try:
         if details.__len__() > 0:
