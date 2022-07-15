@@ -9,6 +9,7 @@ app = Flask(__name__)
 
 app.secret_key = 'secret_key'
 
+
 #
 # lr = pickle.load(
 #     open("model_pkl","rb")
@@ -17,9 +18,7 @@ app.secret_key = 'secret_key'
 # routes ---------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def root():
-
     return 'Welcome..!'
-
 
 
 @app.route('/sign_up', methods=["GET", "POST"])
@@ -28,8 +27,8 @@ def sign_up():
     print("LOG ==> ", user_sign_up_data)
     req_user_email = user_sign_up_data['email']
 
-    result={
-        'status':'200'
+    result = {
+        'status': '200'
     }
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
 
@@ -179,26 +178,33 @@ def delete_user():
 @app.route('/todo', methods=["GET", "POST"])
 def to_do():
     task = json.loads(request.data)
-    print("LOG ==> ", task)
+    print("LOG +++==> ", task)
     email = task['email']
-
-    details = mongo_db.TODO.find({"taskid": task['taskid'], "email":task["email"]})
-
+    print(email, "-")
+    details = mongo_db.TODO.find_one({"taskid": task['taskid'], "email": task['email']})
+    print(details)
+    result = {
+        'status': '200'
+    }
     try:
-        if details.__len__() > 0:
-            pass
-        else:
+        if details.__eq__(None):
+
             record = {
                 "taskid": task['taskid'],
                 "email": task['email'],
                 "status": task["status"],
                 "date": task['date'],
             }
+            print('in')
             mongo_db.TODO.insert_one(record)
-
-            return "saved"
-    except Exception:
-        return "null"
+            return result
+        else:
+            result['status'] = '400'
+            return result
+    except Exception as e:
+        print(e)
+        result['status'] = '400'
+        return result
 
 
 @app.route('/get_todoby_user', methods=["GET"])
@@ -247,16 +253,16 @@ def mongo_pred():
             'Date': rgx
         }
         month_data = mongo_db.DATA.find(q)
-        print(month_data.collection," *")
+        print(month_data.collection, " *")
         month_Val = []
-        sum=0
+        sum = 0
         for data in month_data:
             month_Val.append(data['Value'])
-            sum+=data['Value']
-        avg= sum / len(month_Val)
+            sum += data['Value']
+        avg = sum / len(month_Val)
 
         print(avg)
-        list=[]
+        list = []
         predict = int(round(avg))
         # session['this_month_pred'] = predict
         print(predict)
@@ -275,19 +281,18 @@ def mongo_pred():
             'City': {
                 '$eq': district
             },
-            'Date':{
+            'Date': {
                 '$eq': '2020-06-01'
             }
         }
         last_month = mongo_db.DATA.find(lm)
-        print(last_month,">>>>>>")
-        l_m=[]
+        print(last_month, ">>>>>>")
+        l_m = []
         for data in last_month:
             l_m.append(data['Value'])
-            print('data',data['Value'])
+            print('data', data['Value'])
 
         list.append(l_m[0])
-
 
         return jsonify(list)
 
