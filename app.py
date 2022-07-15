@@ -182,17 +182,21 @@ def to_do():
     print("LOG ==> ", task)
     email = task['email']
 
+    details = mongo_db.TODO.find_one({"taskid": task['taskid'], "email":task["email"]})
+
     try:
+        if details.__len__() > 0:
+            pass
+        else:
+            record = {
+                "taskid": task['taskid'],
+                "email": task['email'],
+                "status": task["status"],
+                "date": task['date'],
+            }
+            mongo_db.TODO.insert_one(record)
 
-        record = {
-            "taskid": task['taskid'],
-            "email": task['email'],
-            "status": task["status"],
-            "date": task['date'],
-        }
-        mongo_db.TODO.insert_one(record)
-
-        return "saved"
+            return "saved"
     except Exception:
         return "null"
 
