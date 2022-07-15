@@ -155,8 +155,6 @@ def update_user():
         "district": district
     }}).raw_result.get('n')
 
-    # getPredict(session.get("district"))
-
     if result == 1:
         return "update user"
     else:
