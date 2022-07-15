@@ -3,15 +3,23 @@ from bson import json_util
 from config import mongo_db
 import re
 
+# import pickle
+
 app = Flask(__name__)
 
 app.secret_key = 'secret_key'
 
+#
+# lr = pickle.load(
+#     open("model_pkl","rb")
+# )
 
 # routes ---------------------------------------------------------------------------------------------------------------
 @app.route('/')
 def root():
+
     return 'Welcome..!'
+
 
 
 @app.route('/sign_up', methods=["GET", "POST"])
@@ -74,7 +82,12 @@ def get_all_users():
     for data in get_db_users:
         data['_id'] = str(data['_id'])
         users.append(data)
-    print(users)
+    # print(users)
+    print('in get')
+
+    # print("lr =>",  lr.predict([['2023-08-01']]))
+    print('in get2')
+
     return jsonify(users)
 
 
@@ -103,30 +116,30 @@ def get_user():
         return "null"
 
 
-@app.route('/get_pred', methods=["GET"])
-def get_pred():
-    try:
-        user_district = request.args["district"]
-        print(user_district)
-        # list = getPredict(user_district)
-
-        # search_user_details['predict'] = list[0]
-        # search_user_details['zone'] = list[1]
-
-        # print(search_user_details)
-        #
-        # json_dump = json_util.dumps(search_user_details)
-        # json_data = json.loads(json_dump)
-        print(list)
-        json_data = {
-            'predict': list[0],
-            'zone': list[1]
-        }
-        print(json_data)
-        return jsonify(json_data)
-    except Exception as e:
-        print(e)
-        return "null"
+# @app.route('/get_pred', methods=["GET"])
+# def get_pred():
+#     try:
+#         user_district = request.args["district"]
+#         print(user_district)
+#         # list = getPredict(user_district)
+#
+#         # search_user_details['predict'] = list[0]
+#         # search_user_details['zone'] = list[1]
+#
+#         # print(search_user_details)
+#         #
+#         # json_dump = json_util.dumps(search_user_details)
+#         # json_data = json.loads(json_dump)
+#         print(list)
+#         json_data = {
+#             'predict': list[0],
+#             'zone': list[1]
+#         }
+#         print(json_data)
+#         return jsonify(json_data)
+#     except Exception as e:
+#         print(e)
+#         return "null"
 
 
 # user update ---------------------------------------
@@ -222,7 +235,7 @@ def delete_todo():
 def mongo_pred():
     try:
 
-        rgx = re.compile('.*-01-01.*', re.IGNORECASE)
+        rgx = re.compile('.*-07-01.*', re.IGNORECASE)
         district = request.args["district"]
         print(district)
         q = {
@@ -231,14 +244,14 @@ def mongo_pred():
             },
             'Date': rgx
         }
-        todo_by_user = mongo_db.DATA.find(q)
-        print(todo_by_user.collection," *")
-        taskid = []
+        month_data = mongo_db.DATA.find(q)
+        print(month_data.collection," *")
+        month_Val = []
         sum=0
-        for data in todo_by_user:
-            taskid.append(data['Value'])
+        for data in month_data:
+            month_Val.append(data['Value'])
             sum+=data['Value']
-        avg= sum / len(taskid)
+        avg= sum / len(month_Val)
 
         print(avg)
         list=[]
@@ -255,6 +268,24 @@ def mongo_pred():
         else:
             list.append("Green")
             # session['zone'] = "Green"
+
+        lm = {
+            'City': {
+                '$eq': district
+            },
+            'Date':{
+                '$eq': '2020-06-01'
+            }
+        }
+        last_month = mongo_db.DATA.find(lm)
+        print(last_month,">>>>>>")
+        l_m=[]
+        for data in last_month:
+            l_m.append(data['Value'])
+            print('data',data['Value'])
+
+        list.append(l_m[0])
+
 
         return jsonify(list)
 
