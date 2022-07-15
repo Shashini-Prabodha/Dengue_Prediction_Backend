@@ -1,19 +1,9 @@
+from flask import Flask, jsonify, request, json, session
 from bson import json_util
 from config import mongo_db
-from flask import Flask, jsonify, request, json, session
-from flaskext.mysql import MySQL
-import pymysql
 import re
 
 app = Flask(__name__)
-
-mysql = MySQL()
-
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = '1023'
-app.config['MYSQL_DATABASE_DB'] = 'dengue_d'
-app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-mysql.init_app(app)
 
 app.secret_key = 'secret_key'
 
@@ -31,13 +21,14 @@ def sign_up():
     req_user_email = user_sign_up_data['email']
 
     result={
-        'staus':'200'
+        'status':'200'
     }
     search_user_details = mongo_db.USER.find_one({"email": req_user_email})
 
     try:
         if search_user_details.__len__() > 0:
-            return "null"
+            result['status'] = '400'
+            return result
     except Exception:
         print("search_user_details else ", search_user_details)
 
@@ -117,7 +108,7 @@ def get_pred():
     try:
         user_district = request.args["district"]
         print(user_district)
-        list = getPredict(user_district)
+        # list = getPredict(user_district)
 
         # search_user_details['predict'] = list[0]
         # search_user_details['zone'] = list[1]
@@ -272,46 +263,46 @@ def mongo_pred():
         return "null"
 
 
-# get zone
-def getPredict(city):
-    print('in')
-    # city =json.loads(request.data)
-    # print(city['city'])
-    try:
-        # req_user_email = request.json
-        # print(req_user_email)
-        conn = mysql.connect()
-        print("1")
-        cursor = conn.cursor()
-        cursor.execute("select avg(value) from dengue_d.dd where city = %s and  date like '%%01-01' ", city)
-        print("2")
-        rows = cursor.fetchall().__getitem__(0)
-        print(rows)
-        list = []
-        p = 0.0
-        for data in rows:
-            p = (float(data))
-
-        print(p, "**")
-        predict = int(round(p))
-        # session['this_month_pred'] = predict
-        print(predict)
-        list.append(predict)
-
-        if predict >= 1000:
-            list.append("Red")
-        elif predict >= 500:
-            # zone = "Yellow"
-            list.append("Yellow")
-        else:
-            list.append("Green")
-            # session['zone'] = "Green"
-
-        return list
-
-    except Exception as e:
-        print(e)
-        return e
+# # get zone
+# def getPredict(city):
+#     print('in')
+#     # city =json.loads(request.data)
+#     # print(city['city'])
+#     try:
+#         # req_user_email = request.json
+#         # print(req_user_email)
+#         conn = mysql.connect()
+#         print("1")
+#         cursor = conn.cursor()
+#         cursor.execute("select avg(value) from dengue_d.dd where city = %s and  date like '%%01-01' ", city)
+#         print("2")
+#         rows = cursor.fetchall().__getitem__(0)
+#         print(rows)
+#         list = []
+#         p = 0.0
+#         for data in rows:
+#             p = (float(data))
+#
+#         print(p, "**")
+#         predict = int(round(p))
+#         # session['this_month_pred'] = predict
+#         print(predict)
+#         list.append(predict)
+#
+#         if predict >= 1000:
+#             list.append("Red")
+#         elif predict >= 500:
+#             # zone = "Yellow"
+#             list.append("Yellow")
+#         else:
+#             list.append("Green")
+#             # session['zone'] = "Green"
+#
+#         return list
+#
+#     except Exception as e:
+#         print(e)
+#         return e
 
 
 # save task list on start
