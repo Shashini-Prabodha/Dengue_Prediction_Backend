@@ -187,7 +187,10 @@ def to_do():
         'status': '200'
     }
     try:
-        if details.__eq__(None):
+        if details.__len__() > 0:
+            result['status'] = '400'
+            return result
+    except Exception:
 
             record = {
                 "taskid": task['taskid'],
@@ -198,13 +201,8 @@ def to_do():
             print('in')
             mongo_db.TODO.insert_one(record)
             return result
-        else:
-            result['status'] = '400'
-            return result
-    except Exception as e:
-        print(e)
-        result['status'] = '400'
-        return result
+
+
 
 
 @app.route('/get_todoby_user', methods=["GET"])
